@@ -1,13 +1,13 @@
-package service;
+package org.example.rentapartment.service;
 
-import model.User;
-import model.apartment.Apartment;
-import model.apartment.ApartmentDTO;
-import model.apartment.ApartmentSearchDTO;
+import org.example.rentapartment.model.User;
+import org.example.rentapartment.model.apartment.Apartment;
+import org.example.rentapartment.model.apartment.ApartmentDTO;
+import org.example.rentapartment.model.apartment.ApartmentSearchDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.ApartmentRepository;
-import repository.UserRepository;
+import org.example.rentapartment.repository.ApartmentRepository;
+import org.example.rentapartment.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Collections;

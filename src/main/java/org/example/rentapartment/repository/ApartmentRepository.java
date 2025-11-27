@@ -1,7 +1,7 @@
-package repository;
+package org.example.rentapartment.repository;
 
-import model.apartment.Apartment;
-import model.apartment.ApartmentSearchDTO;
+import org.example.rentapartment.model.apartment.Apartment;
+import org.example.rentapartment.model.apartment.ApartmentSearchDTO;
 
 import java.util.Collection;
 import java.util.Optional;

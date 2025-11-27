@@ -1,4 +1,4 @@
-package model.apartment;
+package org.example.rentapartment.model.apartment;
 
 public class ApartmentParameters {
 

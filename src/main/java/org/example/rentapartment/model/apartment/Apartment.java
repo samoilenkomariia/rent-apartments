@@ -1,24 +1,30 @@
-package model.apartment;
+package org.example.rentapartment.model.apartment;
+
+import org.example.rentapartment.model.User;
 
 import java.math.BigDecimal;
 
-public class ApartmentDTO {
+public class Apartment {
     private Long id;
     private BigDecimal price;
     private Address address;
     private ApartmentParameters parameters;
     private ApartmentDescription description;
-    private Long landlordId;
+    private User landLord;
 
-    public ApartmentDTO() {}
+    public Apartment() {}
 
-    public ApartmentDTO(Long id, BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, Long landlordId) {
+    public Apartment(Long id, BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landLord) {
         this.id = id;
         this.price = price;
         this.address = address;
         this.parameters = parameters;
         this.description = description;
-        this.landlordId = landlordId;
+        this.landLord = landLord;
+    }
+
+    public Apartment(BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landLord) {
+        this(null, price, address, parameters, description, landLord);
     }
 
     public Long getId() {
@@ -61,11 +67,11 @@ public class ApartmentDTO {
         this.description = description;
     }
 
-    public Long getLandlordId() {
-        return landlordId;
+    public User getLandLord() {
+        return landLord;
     }
 
-    public void setLandlordId(Long landlordId) {
-        this.landlordId = landlordId;
+    public void setLandLord(User landLord) {
+        this.landLord = landLord;
     }
 }

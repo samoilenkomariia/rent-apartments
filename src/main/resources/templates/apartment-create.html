@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Apartment</title>
+    <style>
+        .form-group { margin-bottom: 10px; }
+        label { display: inline-block; width: 150px; }
+    </style>
+</head>
+<body>
+<h1>New Apartment</h1>
+
+<form action="#" th:action="@{/apartments/create}" th:object="${apartmentDTO}" method="post">
+
+    <h3>Basic Info</h3>
+    <div class="form-group">
+        <label>Price (UAH):</label>
+        <input type="number" th:field="*{price}" required/>
+    </div>
+    <div class="form-group">
+        <label>Description:</label>
+        <input type="text" th:field="*{description.text}" />
+    </div>
+
+    <h3>Address</h3>
+    <div class="form-group">
+        <label>Country:</label>
+        <input type="text" th:field="*{address.country}" required/>
+    </div>
+    <div class="form-group">
+        <label>Region:</label>
+        <input type="text" th:field="*{address.region}" required/>
+    </div>
+    <div class="form-group">
+        <label>City:</label>
+        <input type="text" th:field="*{address.city}" required/>
+    </div>
+    <div class="form-group">
+        <label>District:</label>
+        <input type="text" th:field="*{address.district}" required/>
+    </div>
+    <div class="form-group">
+        <label>Street:</label>
+        <input type="text" th:field="*{address.street}" required/>
+    </div>
+    <div class="form-group">
+        <label>Building No:</label>
+        <input type="text" th:field="*{address.buildingNumber}" required/>
+    </div>
+    <div class="form-group">
+        <label>Apartment No:</label>
+        <input type="text" th:field="*{address.apartmentNumber}" />
+    </div>
+
+    <h3>Parameters</h3>
+    <div class="form-group">
+        <label>Total Area (m²):</label>
+        <input type="number" step="0.1" th:field="*{parameters.totalArea}" required/>
+    </div>
+    <div class="form-group">
+        <label>Living Area (m²):</label>
+        <input type="number" step="0.1" th:field="*{parameters.livingArea}" required/>
+    </div>
+    <div class="form-group">
+        <label>Rooms:</label>
+        <input type="number" th:field="*{parameters.roomCount}" required/>
+    </div>
+    <div class="form-group">
+        <label>Floor:</label>
+        <input type="number" th:field="*{parameters.floor}" required/>
+    </div>
+    <div class="form-group">
+        <label>Total Floors:</label>
+        <input type="number" th:field="*{parameters.totalFloors}" required/>
+    </div>
+    <div class="form-group">
+        <label>Build Year:</label>
+        <input type="number" th:field="*{parameters.buildYear}" required/>
+    </div>
+
+    <br>
+    <button type="submit">Save Apartment</button>
+</form>
+
+<br>
+<a href="/apartments">Back to List</a>
+</body>
+</html>

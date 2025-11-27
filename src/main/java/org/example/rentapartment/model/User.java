@@ -1,4 +1,4 @@
-package model;
+package org.example.rentapartment.model;
 
 public class User {
     private Long id;

@@ -1,9 +1,9 @@
-package service;
+package org.example.rentapartment.service;
 
-import model.User;
+import org.example.rentapartment.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import repository.UserRepository;
+import org.example.rentapartment.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Optional;

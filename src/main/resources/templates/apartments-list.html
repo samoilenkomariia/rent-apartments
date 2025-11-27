@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Apartment Rentals</title>
+</head>
+<body>
+<h1>Available Apartments</h1>
+<p>Session ID: <span th:text="${tracker}"></span></p>
+
+<a href="/apartments/create">Add New Apartment</a>
+<br><br>
+
+<table border="1" cellpadding="5">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>City</th>
+        <th>Price</th>
+        <th>Rooms</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="apt : ${apartments}">
+        <td th:text="${apt.id}">1</td>
+        <td th:text="${apt.address.city}">Kyiv</td>
+        <td th:text="${apt.price}">15000</td>
+        <td th:text="${apt.parameters.roomCount}">2</td>
+        <td>
+            <a th:href="@{/apartments/{id}(id=${apt.id})}">View</a> |
+            <a th:href="@{/apartments/delete/{id}(id=${apt.id})}">Delete</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

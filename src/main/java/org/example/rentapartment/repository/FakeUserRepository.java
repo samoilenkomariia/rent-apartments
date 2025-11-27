@@ -1,6 +1,6 @@
-package repository;
+package org.example.rentapartment.repository;
 
-import model.User;
+import org.example.rentapartment.model.User;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;

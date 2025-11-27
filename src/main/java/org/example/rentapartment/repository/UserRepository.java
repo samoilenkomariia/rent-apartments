@@ -1,6 +1,6 @@
-package repository;
+package org.example.rentapartment.repository;
 
-import model.User;
+import org.example.rentapartment.model.User;
 
 import java.util.Collection;
 import java.util.Optional;
