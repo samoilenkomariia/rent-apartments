@@ -11,6 +11,7 @@ import org.example.rentapartment.repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -37,15 +38,15 @@ public class ApartmentService {
     public Apartment update(Long id, ApartmentDTO dto) {
         Apartment existing = apartmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Apartment not found"));
-
+        if (!Objects.equals(id, dto.getId())) throw new IllegalArgumentException("Invalid apartment id");
         existing.setPrice(dto.getPrice());
         existing.setAddress(dto.getAddress());
         existing.setParameters(dto.getParameters());
         existing.setDescription(dto.getDescription());
-        if (!existing.getLandLord().getId().equals(dto.getLandlordId())) {
+        if (!existing.getLandlord().getId().equals(dto.getLandlordId())) {
             User newLandlord = userRepository.findById(dto.getLandlordId())
                     .orElseThrow(() -> new IllegalArgumentException("User not found"));
-            existing.setLandLord(newLandlord);
+            existing.setLandlord(newLandlord);
         }
         return apartmentRepository.save(existing);
     }

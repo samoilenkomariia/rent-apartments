@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 @RequestMapping("apartments")
-@Controller
+@RestController
 public class ApartmentController implements ApartmentControllerApi {
     private ApartmentService apartmentService;
     private ObjectMapper objectMapper;
@@ -107,7 +107,7 @@ public class ApartmentController implements ApartmentControllerApi {
             dto.setAddress(apt.getAddress());
             dto.setParameters(apt.getParameters());
             dto.setDescription(apt.getDescription());
-            dto.setLandlordId(apt.getLandLord().getId());
+            dto.setLandlordId(apt.getLandlord().getId());
             JsonNode json = objectMapper.convertValue(dto, JsonNode.class);
             json = patch.apply(json);
             ApartmentDTO patchedDto = objectMapper.treeToValue(json, ApartmentDTO.class);

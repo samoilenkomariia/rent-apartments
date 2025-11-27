@@ -30,8 +30,7 @@ public interface UserControllerApi {
     @GetMapping("/{id}")
     @Operation(
             summary = "Get User By Id",
-            description = "Retrieve specific user by ID",
-            parameters = {@Parameter(name = "id", description = "user id", example = "1")}
+            description = "Retrieve specific user by ID"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User found"),
@@ -53,8 +52,7 @@ public interface UserControllerApi {
     @PutMapping("/{id}")
     @Operation(
             summary = "Update User",
-            description = "Fully update an existing user's information.",
-            parameters = {@Parameter(name = "id", description = "user id", example = "1")}
+            description = "Fully update an existing user's information."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User updated successfully"),
@@ -65,8 +63,7 @@ public interface UserControllerApi {
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
     @Operation(
             summary = "Patch User Json Patch",
-            description = "Update specific fields of a user using RFC 6902 JSON Patch format.",
-            parameters = {@Parameter(name = "id", description = "user id", example = "1")}
+            description = "Update specific fields of a user using RFC 6902 JSON Patch format."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User patched successfully"),
@@ -82,8 +79,7 @@ public interface UserControllerApi {
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
     @Operation(
             summary = "Patch User Merge Patch",
-            description = "Update specific fields of a user using RFC 7386 JSON Merge Patch format.",
-            parameters = {@Parameter(name = "id", description = "user id", example = "1")}
+            description = "Update specific fields of a user using RFC 7386 JSON Merge Patch format."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User patched successfully"),
@@ -100,8 +96,7 @@ public interface UserControllerApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete User",
-            description = "Permanently remove a user from the system.",
-            parameters = {@Parameter(name = "id", description = "user id", example = "1")}
+            description = "Permanently remove a user from the system."
     )
     void deleteById(@PathVariable Long id);
 }

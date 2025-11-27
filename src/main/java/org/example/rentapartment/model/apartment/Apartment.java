@@ -10,21 +10,21 @@ public class Apartment {
     private Address address;
     private ApartmentParameters parameters;
     private ApartmentDescription description;
-    private User landLord;
+    private User landlord;
 
     public Apartment() {}
 
-    public Apartment(Long id, BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landLord) {
+    public Apartment(Long id, BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landlord) {
         this.id = id;
         this.price = price;
         this.address = address;
         this.parameters = parameters;
         this.description = description;
-        this.landLord = landLord;
+        this.landlord = landlord;
     }
 
-    public Apartment(BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landLord) {
-        this(null, price, address, parameters, description, landLord);
+    public Apartment(BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landlord) {
+        this(null, price, address, parameters, description, landlord);
     }
 
     public Long getId() {
@@ -67,11 +67,11 @@ public class Apartment {
         this.description = description;
     }
 
-    public User getLandLord() {
-        return landLord;
+    public User getLandlord() {
+        return landlord;
     }
 
-    public void setLandLord(User landLord) {
-        this.landLord = landLord;
+    public void setLandlord(User landlord) {
+        this.landlord = landlord;
     }
 }

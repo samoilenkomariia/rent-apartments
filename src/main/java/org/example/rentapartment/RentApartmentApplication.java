@@ -10,10 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @OpenAPIDefinition (
         info = @Info(
                 title = "Rent Apartments",
-                contact = @Contact(
-                        name = "Mariia Samoilenko IM-32"
-                ),
-                description = "RESTful service for Renting Apartments"
+                description = "RESTful service for Renting Apartments by Samoilenko Mariia IM-32"
         ),
         servers = @Server(url = "http://localhost:8080", description = "local server")
 )

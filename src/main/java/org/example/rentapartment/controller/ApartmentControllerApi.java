@@ -31,8 +31,7 @@ public interface ApartmentControllerApi {
     @GetMapping("/{id}")
     @Operation(
             summary = "Get Apartment By Id",
-            description = "Retrieve details of a specific apartment by ID",
-            parameters = {@Parameter(name = "id", description = "apartment id", example = "1")}
+            description = "Retrieve details of a specific apartment by ID"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Apartment found"),
@@ -55,13 +54,12 @@ public interface ApartmentControllerApi {
     @PutMapping("/{id}")
     @Operation(
             summary = "Update Apartment",
-            description = "Fully update an existing apartment, all fields must be provided.",
-            parameters = {@Parameter(name = "id", description = "apartment id", example = "1")}
+            description = "Fully update an existing apartment, all fields must be provided."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Apartment updated successfully"),
             @ApiResponse(responseCode = "400", description = "Bad Request: ID mismatch or invalid data", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Apartment not found", content = @Content)
+            @ApiResponse(responseCode = "404", description = "Apartment or Landlord not found", content = @Content)
     })
     ResponseEntity<Apartment> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto);
 
@@ -76,8 +74,7 @@ public interface ApartmentControllerApi {
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
     @Operation(
             summary = "Patch Apartment Json Patch",
-            description = "Update specific fields of an apartment using RFC 6902 JSON Patch format.",
-            parameters = {@Parameter(name = "id", description = "apartment id", example = "1")}
+            description = "Update specific fields of an apartment using RFC 6902 JSON Patch format."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Apartment patched successfully"),
@@ -89,8 +86,7 @@ public interface ApartmentControllerApi {
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
     @Operation(
             summary = "Patch Apartment Merge Patch",
-            description = "Update specific fields of an apartment using RFC 7386 JSON Merge Patch format.",
-            parameters = {@Parameter(name = "id", description = "apartment id", example = "1")}
+            description = "Update specific fields of an apartment using RFC 7386 JSON Merge Patch format."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Apartment patched successfully"),
@@ -103,8 +99,7 @@ public interface ApartmentControllerApi {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete Apartment",
-            description = "Permanently remove an apartment",
-            parameters = {@Parameter(name = "id", description = "apartment id", example = "1")}
+            description = "Permanently remove an apartment"
     )
     void deleteById(@PathVariable Long id);
 }
