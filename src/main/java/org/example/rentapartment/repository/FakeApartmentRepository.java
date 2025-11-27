@@ -44,6 +44,8 @@ public class FakeApartmentRepository implements ApartmentRepository {
                 .filter(apt -> dto.getFloor() == null || dto.getFloor().equals(apt.getParameters().getFloor()))
                 .filter(apt -> dto.getRoomCount() == null || dto.getRoomCount().equals(apt.getParameters().getRoomCount()))
                 .filter(apt -> dto.getTotalArea() == null || dto.getTotalArea().equals(apt.getParameters().getTotalArea()))
+                .skip((long) dto.getPage() * dto.getPageSize())
+                .limit(dto.getPageSize())
                 .toList();
     }
 

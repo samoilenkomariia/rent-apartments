@@ -1,67 +1,120 @@
 package org.example.rentapartment.controller;
-
-import org.example.rentapartment.model.apartment.Address;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import com.github.fge.jsonpatch.Patch;
+import jakarta.servlet.ServletRequest;
 import org.example.rentapartment.model.apartment.Apartment;
 import org.example.rentapartment.model.apartment.ApartmentDTO;
-import org.example.rentapartment.model.apartment.ApartmentParameters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.example.rentapartment.model.apartment.ApartmentSearchDTO;
 import org.example.rentapartment.service.ApartmentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Collection;
 import java.util.Optional;
 
+@RequestMapping("apartments")
 @Controller
-@RequestMapping("/apartments")
 public class ApartmentController {
-
     private ApartmentService apartmentService;
-    private final String requestTracker;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public ApartmentController(ApartmentService apartmentService, String requestTracker) {
+    public ApartmentController(ApartmentService apartmentService,  ObjectMapper objectMapper) {
         this.apartmentService = apartmentService;
-        this.requestTracker = requestTracker;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping
-    public String listApartments(Model model) {
-        model.addAttribute("apartments", apartmentService.findAll());
-        model.addAttribute("tracker", requestTracker);
-        return "apartments-list";
-    }
-
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        ApartmentDTO dto = new ApartmentDTO();
-        dto.setAddress(new Address());
-        dto.setParameters(new ApartmentParameters());
-        model.addAttribute("apartmentDTO", dto);
-        return "apartment-create";
+    public ResponseEntity<Collection<Apartment>> getAll() {
+        return ResponseEntity.ok(apartmentService.findAll());
     }
 
     @GetMapping("/{id}")
-    public String viewApartment(@PathVariable Long id, Model model) {
-        Optional<Apartment> apt = apartmentService.findById(id);
-        if (apt.isPresent()) {
-            model.addAttribute("apartment", apt.get());
-            return "apartment-details";
-        } else {
-            return "redirect:/apartments";
+    public ResponseEntity<Apartment> getById(@PathVariable Long id, ServletRequest servletRequest) {
+        return apartmentService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Apartment> create(@RequestBody ApartmentDTO dto) {
+        Apartment newApart;
+        try {
+            newApart = apartmentService.create(dto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                .path("/{id}").buildAndExpand(newApart.getId()).toUri();
+        return ResponseEntity.created(uri).body(newApart);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Apartment> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto) {
+        if (aptDto.getId() != null && !aptDto.getId().equals(id)) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            Apartment updated = apartmentService.update(id, aptDto);
+            return  ResponseEntity.ok(updated);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Collection<Apartment>> search(@ModelAttribute ApartmentSearchDTO searchDTO) {
+        Collection<Apartment> apartments = apartmentService.findByFilters(searchDTO);
+        return ResponseEntity.ok(apartments);
+    }
+
+    @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
+    public ResponseEntity<Apartment> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch) {
+        return patch(id, patch);
+    }
+
+    @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
+    public ResponseEntity<Apartment> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
+        return patch(id, patch);
+    }
+
+    private ResponseEntity<Apartment> patch(Long id, Patch patch) {
+        Optional<Apartment> aptOptional = apartmentService.findById(id);
+        if (aptOptional.isEmpty()) return ResponseEntity.notFound().build();
+        Apartment apt = aptOptional.get();
+        try {
+            ApartmentDTO dto = new ApartmentDTO();
+            dto.setId(apt.getId());
+            dto.setPrice(apt.getPrice());
+            dto.setAddress(apt.getAddress());
+            dto.setParameters(apt.getParameters());
+            dto.setDescription(apt.getDescription());
+            dto.setLandlordId(apt.getLandLord().getId());
+            JsonNode json = objectMapper.convertValue(dto, JsonNode.class);
+            json = patch.apply(json);
+            ApartmentDTO patchedDto = objectMapper.treeToValue(json, ApartmentDTO.class);
+            Apartment updatedApt = apartmentService.update(id, patchedDto);
+
+            return ResponseEntity.ok(updatedApt);
+        } catch (JsonPatchException | JsonProcessingException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
-    @PostMapping("/create")
-    public String createApartment(@ModelAttribute ApartmentDTO dto) {
-        dto.setLandlordId(1L);
-        apartmentService.create(dto);
-        return "redirect:/apartments";
-    }
-
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
         apartmentService.deleteById(id);
-        return "redirect:/apartments";
     }
 }

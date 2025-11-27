@@ -24,16 +24,6 @@ public class ApartmentService {
         this.userRepository = userRepository;
     }
 
-    public Apartment save(Apartment apartment) {
-        if (apartment == null) {
-            throw new IllegalArgumentException("Apartment cannot be null");
-        }
-        if (apartment.getLandLord() == null) {
-            throw new IllegalArgumentException("Apartment must have a valid Landlord assigned.");
-        }
-        return apartmentRepository.save(apartment);
-    }
-
     public Apartment create(ApartmentDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("Apartment cannot be null");
