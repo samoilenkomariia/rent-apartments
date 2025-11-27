@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @RequestMapping("apartments")
 @Controller
-public class ApartmentController {
+public class ApartmentController implements ApartmentControllerApi {
     private ApartmentService apartmentService;
     private ObjectMapper objectMapper;
 
@@ -35,11 +35,13 @@ public class ApartmentController {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<Collection<Apartment>> getAll() {
         return ResponseEntity.ok(apartmentService.findAll());
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<Apartment> getById(@PathVariable Long id, ServletRequest servletRequest) {
         return apartmentService.findById(id)
                 .map(ResponseEntity::ok)
@@ -47,6 +49,7 @@ public class ApartmentController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<Apartment> create(@RequestBody ApartmentDTO dto) {
         Apartment newApart;
         try {
@@ -60,6 +63,7 @@ public class ApartmentController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<Apartment> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto) {
         if (aptDto.getId() != null && !aptDto.getId().equals(id)) {
             return ResponseEntity.badRequest().build();
@@ -74,17 +78,20 @@ public class ApartmentController {
     }
 
     @GetMapping("/search")
+    @Override
     public ResponseEntity<Collection<Apartment>> search(@ModelAttribute ApartmentSearchDTO searchDTO) {
         Collection<Apartment> apartments = apartmentService.findByFilters(searchDTO);
         return ResponseEntity.ok(apartments);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
+    @Override
     public ResponseEntity<Apartment> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch) {
         return patch(id, patch);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
+    @Override
     public ResponseEntity<Apartment> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
         return patch(id, patch);
     }
@@ -114,6 +121,7 @@ public class ApartmentController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
     public void deleteById(@PathVariable Long id) {
         apartmentService.deleteById(id);
     }

@@ -7,6 +7,8 @@ import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.github.fge.jsonpatch.Patch;
 import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.example.rentapartment.model.User;
 import org.example.rentapartment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/users")
-public class UserController {
+public class UserController implements UserControllerApi {
     private UserService userService;
     private ObjectMapper objectMapper;
 
@@ -33,12 +35,14 @@ public class UserController {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<Collection<User>> getAllUsers() {
         Collection<User> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<User> getById(@PathVariable Long id) {
         return userService.findById(id)
                 .map(ResponseEntity::ok)
@@ -46,14 +50,20 @@ public class UserController {
     }
 
     @PostMapping
+    @Override
     public ResponseEntity<User> create(@RequestBody User user) {
-        User newUser = userService.save(user);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                .path("/{id}").buildAndExpand(newUser.getId()).toUri();
-        return ResponseEntity.created(uri).body(newUser);
+        try {
+            User newUser = userService.save(user);
+            URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                    .path("/{id}").buildAndExpand(newUser.getId()).toUri();
+            return ResponseEntity.created(uri).body(newUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User userDto) {
         if (userDto.getId() != null && !userDto.getId().equals(id)) {
             return ResponseEntity.badRequest().build();
@@ -67,12 +77,20 @@ public class UserController {
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
-    public ResponseEntity<User> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch) {
+    @Override
+    public ResponseEntity<User> jsonPatch(@PathVariable Long id,
+                                          @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Json Patch operations array",
+                                                  content = @Content(schema = @Schema(implementation = JsonPatch.class)))
+                                          @RequestBody JsonPatch patch) {
         return patch(id, patch);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
-    public ResponseEntity<User> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
+    @Override
+    public ResponseEntity<User> jsonMergePatch(@PathVariable Long id,
+                                               @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "JSON Merge Patch object",
+                                                       content = @Content(schema = @Schema(implementation = JsonMergePatch.class)))
+                                               @RequestBody JsonMergePatch patch) {
         return patch(id, patch);
     }
 
@@ -92,6 +110,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Override
     public void deleteById(@PathVariable Long id) {
         userService.deleteById(id);
     }
