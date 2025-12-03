@@ -1,15 +1,34 @@
 package org.example.rentapartment.model.apartment;
 
+import jakarta.persistence.*;
 import org.example.rentapartment.model.User;
 
 import java.math.BigDecimal;
 
+@Entity
+@Table(name = "apartment")
+@NamedQuery(
+        name = "Apartment.findByPriceLessThan",
+        query = "SELECT a FROM Apartment a WHERE a.price < ?1"
+)
 public class Apartment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private BigDecimal price;
+
+    @Embedded
     private Address address;
+
+    @Embedded
     private ApartmentParameters parameters;
+
+    @Embedded
     private ApartmentDescription description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "landlord_id")
     private User landlord;
 
     public Apartment() {}
@@ -21,10 +40,6 @@ public class Apartment {
         this.parameters = parameters;
         this.description = description;
         this.landlord = landlord;
-    }
-
-    public Apartment(BigDecimal price, Address address, ApartmentParameters parameters, ApartmentDescription description, User landlord) {
-        this(null, price, address, parameters, description, landlord);
     }
 
     public Long getId() {

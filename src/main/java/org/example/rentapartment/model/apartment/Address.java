@@ -1,5 +1,8 @@
 package org.example.rentapartment.model.apartment;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Address {
     private String country;
     private String region;

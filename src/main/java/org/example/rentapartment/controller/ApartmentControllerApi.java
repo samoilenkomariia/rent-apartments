@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 @Tag(name = "Apartment", description = "Apartment operations")
@@ -26,7 +27,7 @@ public interface ApartmentControllerApi {
             summary = "Get All Apartments",
             description = "Get a list of all available apartments."
     )
-    ResponseEntity<Collection<Apartment>> getAll();
+    ResponseEntity<Collection<ApartmentDTO>> getAll();
 
     @GetMapping("/{id}")
     @Operation(
@@ -37,7 +38,7 @@ public interface ApartmentControllerApi {
             @ApiResponse(responseCode = "200", description = "Apartment found"),
             @ApiResponse(responseCode = "404", description = "Apartment not found", content = @Content)
     })
-    ResponseEntity<Apartment> getById(@PathVariable Long id, ServletRequest servletRequest);
+    ResponseEntity<ApartmentDTO> getById(@PathVariable Long id);
 
     @PostMapping
     @Operation(
@@ -49,7 +50,7 @@ public interface ApartmentControllerApi {
             @ApiResponse(responseCode = "201", description = "Apartment successfully created"),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content)
     })
-    ResponseEntity<Apartment> create(@RequestBody ApartmentDTO dto);
+    ResponseEntity<ApartmentDTO> create(@RequestBody ApartmentDTO dto);
 
     @PutMapping("/{id}")
     @Operation(
@@ -61,15 +62,7 @@ public interface ApartmentControllerApi {
             @ApiResponse(responseCode = "400", description = "Bad Request: ID mismatch or invalid data", content = @Content),
             @ApiResponse(responseCode = "404", description = "Apartment or Landlord not found", content = @Content)
     })
-    ResponseEntity<Apartment> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto);
-
-    @GetMapping("/search")
-    @Operation(
-            summary = "Search Apartments",
-            description = "Search for apartments using filters like city, price, floor etc. Supports pagination"
-    )
-    @ApiResponse(responseCode = "200", description = "Search results retrieved successfully")
-    ResponseEntity<Collection<Apartment>> search(@ModelAttribute ApartmentSearchDTO searchDTO);
+    ResponseEntity<ApartmentDTO> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto);
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
     @Operation(
@@ -81,7 +74,7 @@ public interface ApartmentControllerApi {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid patch format", content = @Content),
             @ApiResponse(responseCode = "404", description = "Apartment not found", content = @Content)
     })
-    ResponseEntity<Apartment> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch);
+    ResponseEntity<ApartmentDTO> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch);
 
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
     @Operation(
@@ -93,7 +86,7 @@ public interface ApartmentControllerApi {
             @ApiResponse(responseCode = "400", description = "Bad Request: Invalid patch format", content = @Content),
             @ApiResponse(responseCode = "404", description = "Apartment not found", content = @Content)
     })
-    ResponseEntity<Apartment> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch);
+    ResponseEntity<ApartmentDTO> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch);
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -102,4 +95,35 @@ public interface ApartmentControllerApi {
             description = "Permanently remove an apartment"
     )
     void deleteById(@PathVariable Long id);
+
+    @GetMapping("/search/byRegion")
+    @Operation(
+            summary = "Search Apartments by Region",
+            description = "Filter apartments that are located in a specific region"
+    )
+    @ApiResponse(responseCode = "200", description = "Search results retrieved successfully")
+    ResponseEntity<Collection<ApartmentDTO>> searchByRegion(
+            @Parameter(description = "DTO containing the region filter", required = true)
+            @ModelAttribute ApartmentSearchDTO searchDTO);
+
+    @GetMapping("/search/byCity")
+    @Operation(
+            summary = "Search Apartments by City",
+            description = "Filter apartments by city"
+    )
+    @ApiResponse(responseCode = "200", description = "Search results retrieved successfully")
+    ResponseEntity<Collection<ApartmentDTO>> searchByCity(
+            @Parameter(description = "DTO containing the city filter", required = true)
+            @ModelAttribute ApartmentSearchDTO searchDTO);
+
+    @GetMapping("/search/byPrice")
+    @Operation(
+            summary = "Search Apartments by Price",
+            description = "Find apartments cheaper than the specified price"
+    )
+    @ApiResponse(responseCode = "200", description = "Search results retrieved successfully")
+    ResponseEntity<Collection<ApartmentDTO>> searchByPrice(
+            @Parameter(description = "Maximum price threshold", required = true)
+            @RequestParam BigDecimal price);
 }
+

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
@@ -24,32 +25,46 @@ import java.util.Optional;
 @RequestMapping("apartments")
 @RestController
 public class ApartmentController implements ApartmentControllerApi {
-    private ApartmentService apartmentService;
-    private ObjectMapper objectMapper;
+    private final ApartmentService apartmentService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public ApartmentController(ApartmentService apartmentService,  ObjectMapper objectMapper) {
         this.apartmentService = apartmentService;
         this.objectMapper = objectMapper;
     }
+    private ApartmentDTO mapToDTO(Apartment apartment) {
+        return new ApartmentDTO(
+                apartment.getId(),
+                apartment.getPrice(),
+                apartment.getAddress(),
+                apartment.getParameters(),
+                apartment.getDescription(),
+                apartment.getLandlord().getId()
+        );
+    }
 
     @GetMapping
     @Override
-    public ResponseEntity<Collection<Apartment>> getAll() {
-        return ResponseEntity.ok(apartmentService.findAll());
+    public ResponseEntity<Collection<ApartmentDTO>> getAll() {
+        Collection<ApartmentDTO> dtos = apartmentService.findAll().stream()
+                .map(this::mapToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
     @Override
-    public ResponseEntity<Apartment> getById(@PathVariable Long id, ServletRequest servletRequest) {
+    public ResponseEntity<ApartmentDTO> getById(@PathVariable Long id) {
         return apartmentService.findById(id)
+                .map(this::mapToDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     @Override
-    public ResponseEntity<Apartment> create(@RequestBody ApartmentDTO dto) {
+    public ResponseEntity<ApartmentDTO> create(@RequestBody ApartmentDTO dto) {
         Apartment newApart;
         try {
             newApart = apartmentService.create(dto);
@@ -58,44 +73,67 @@ public class ApartmentController implements ApartmentControllerApi {
         }
         URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri()
                 .path("/{id}").buildAndExpand(newApart.getId()).toUri();
-        return ResponseEntity.created(uri).body(newApart);
+        return ResponseEntity.created(uri).body(mapToDTO(newApart));
     }
 
     @PutMapping("/{id}")
     @Override
-    public ResponseEntity<Apartment> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto) {
+    public ResponseEntity<ApartmentDTO> update(@PathVariable Long id, @RequestBody ApartmentDTO aptDto) {
         if (aptDto.getId() != null && !aptDto.getId().equals(id)) {
             return ResponseEntity.badRequest().build();
         }
         try {
             Apartment updated = apartmentService.update(id, aptDto);
-            return  ResponseEntity.ok(updated);
+            return  ResponseEntity.ok(mapToDTO(updated));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }
 
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search/byRegion")
     @Override
-    public ResponseEntity<Collection<Apartment>> search(@ModelAttribute ApartmentSearchDTO searchDTO) {
-        Collection<Apartment> apartments = apartmentService.findByFilters(searchDTO);
+    public ResponseEntity<Collection<ApartmentDTO>> searchByRegion(@ModelAttribute ApartmentSearchDTO searchDTO) {
+        Collection<ApartmentDTO> apartments = apartmentService.findByRegion(searchDTO)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
         return ResponseEntity.ok(apartments);
+    }
+
+    @GetMapping("/search/byCity")
+    @Override
+    public ResponseEntity<Collection<ApartmentDTO>> searchByCity(@ModelAttribute ApartmentSearchDTO searchDTO) {
+        Collection<ApartmentDTO> apartments = apartmentService.findByCity(searchDTO)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+        return ResponseEntity.ok(apartments);
+    }
+
+    @GetMapping("/search/byPrice")
+    @Override
+    public ResponseEntity<Collection<ApartmentDTO>> searchByPrice(@RequestParam BigDecimal price) {
+        Collection<ApartmentDTO> dtos = apartmentService.findByPriceLessThan(price)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/json-patch+json")
     @Override
-    public ResponseEntity<Apartment> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch) {
+    public ResponseEntity<ApartmentDTO> jsonPatch(@PathVariable Long id, @RequestBody JsonPatch patch) {
         return patch(id, patch);
     }
 
     @PatchMapping(path = "/{id}", consumes = "application/merge-patch+json")
     @Override
-    public ResponseEntity<Apartment> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
+    public ResponseEntity<ApartmentDTO> jsonMergePatch(@PathVariable Long id, @RequestBody JsonMergePatch patch) {
         return patch(id, patch);
     }
 
-    private ResponseEntity<Apartment> patch(Long id, Patch patch) {
+    private ResponseEntity<ApartmentDTO> patch(Long id, Patch patch) {
         Optional<Apartment> aptOptional = apartmentService.findById(id);
         if (aptOptional.isEmpty()) return ResponseEntity.notFound().build();
         Apartment apt = aptOptional.get();
@@ -110,9 +148,8 @@ public class ApartmentController implements ApartmentControllerApi {
             JsonNode json = objectMapper.convertValue(dto, JsonNode.class);
             json = patch.apply(json);
             ApartmentDTO patchedDto = objectMapper.treeToValue(json, ApartmentDTO.class);
-            Apartment updatedApt = apartmentService.update(id, patchedDto);
 
-            return ResponseEntity.ok(updatedApt);
+            return ResponseEntity.ok(patchedDto);
         } catch (JsonPatchException | JsonProcessingException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }

@@ -10,6 +10,7 @@ import org.example.rentapartment.repository.ApartmentRepository;
 import org.example.rentapartment.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -31,9 +32,14 @@ public class ApartmentService {
         if (dto == null) {
             throw new IllegalArgumentException("Apartment cannot be null");
         }
-        User landLord = userRepository.findById(dto.getLandlordId())
+        User landlord = userRepository.findById(dto.getLandlordId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        Apartment apartment = new Apartment(dto.getPrice(), dto.getAddress(), dto.getParameters(), dto.getDescription(), landLord);
+        Apartment apartment = new Apartment();
+        apartment.setPrice(dto.getPrice());
+        apartment.setAddress(dto.getAddress());
+        apartment.setParameters(dto.getParameters());
+        apartment.setDescription(dto.getDescription());
+        apartment.setLandlord(landlord);
 
         return apartmentRepository.save(apartment);
     }
@@ -67,10 +73,24 @@ public class ApartmentService {
         apartmentRepository.deleteById(id);
     }
 
-    public Collection<Apartment> findByFilters(ApartmentSearchDTO apartmentSearchDTO) {
-        if (apartmentSearchDTO == null) {
+    public Collection<Apartment> findByCity(ApartmentSearchDTO dto) {
+        if (dto == null) {
             return Collections.emptyList();
         }
-        return apartmentRepository.findByFilters(apartmentSearchDTO);
+        return apartmentRepository.findAllByCityCustom(dto.getCity());
+    }
+
+    public Collection<Apartment> findByRegion(ApartmentSearchDTO dto) {
+        if (dto == null) {
+            return Collections.emptyList();
+        }
+        return apartmentRepository.findByAddress_Region(dto.getRegion());
+    }
+
+    public Collection<Apartment> findByPriceLessThan(BigDecimal price) {
+        if (price == null) {
+            return Collections.emptyList();
+        }
+        return apartmentRepository.findByPriceLessThan(price);
     }
 }

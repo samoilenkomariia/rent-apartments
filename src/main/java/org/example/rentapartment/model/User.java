@@ -1,25 +1,25 @@
 package org.example.rentapartment.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.*;
+import org.example.rentapartment.model.apartment.Apartment;
 
+import java.util.List;
+
+@Entity
+@Table(name = "users")
 public class User {
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max=20)
     private String name;
 
-    @NotNull
-    @Email
     private String email;
 
-    @NotBlank
     private String password;
 
+    @OneToMany(mappedBy = "landlord", cascade = CascadeType.ALL)
+    private List<Apartment> apartments;
     public User(){}
 
     public User(Long id, String name, String email, String password) {

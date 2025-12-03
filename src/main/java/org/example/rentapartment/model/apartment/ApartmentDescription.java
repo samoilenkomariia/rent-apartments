@@ -1,7 +1,10 @@
 package org.example.rentapartment.model.apartment;
 
+import jakarta.persistence.Embeddable;
+
 import java.time.LocalDate;
 
+@Embeddable
 public class ApartmentDescription {
     private LocalDate lastUpdated;
     private String text;
