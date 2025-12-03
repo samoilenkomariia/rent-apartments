@@ -1,20 +1,32 @@
 package org.example.rentapartment.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class User {
+
     private Long id;
+
+    @NotBlank
+    @Size(max=20)
     private String name;
+
+    @NotNull
+    @Email
     private String email;
+
+    @NotBlank
     private String password;
-    private Role role;
 
     public User(){}
 
-    public User(Long id, String name, String email, String password, Role role) {
+    public User(Long id, String name, String email, String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = role;
     }
 
     public Long getId() {
@@ -47,13 +59,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 }

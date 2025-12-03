@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.rentapartment.repository.ApartmentRepository;
 import org.example.rentapartment.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,7 @@ public class ApartmentService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public Apartment create(ApartmentDTO dto) {
         if (dto == null) {
             throw new IllegalArgumentException("Apartment cannot be null");
@@ -32,9 +34,11 @@ public class ApartmentService {
         User landLord = userRepository.findById(dto.getLandlordId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Apartment apartment = new Apartment(dto.getPrice(), dto.getAddress(), dto.getParameters(), dto.getDescription(), landLord);
+
         return apartmentRepository.save(apartment);
     }
 
+    @Transactional
     public Apartment update(Long id, ApartmentDTO dto) {
         Apartment existing = apartmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Apartment not found"));

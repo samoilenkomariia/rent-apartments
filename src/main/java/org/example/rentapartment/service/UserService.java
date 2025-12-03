@@ -4,6 +4,7 @@ import org.example.rentapartment.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.rentapartment.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -17,6 +18,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public User save(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
@@ -24,13 +26,13 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User update(Long id, User dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
-        user.setRole(dto.getRole());
         return userRepository.save(user);
     }
 
